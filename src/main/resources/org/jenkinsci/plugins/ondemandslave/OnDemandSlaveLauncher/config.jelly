@@ -1,0 +1,42 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"  xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <f:entry title="Start command" field="startCommand">
+        <f:expandableTextbox  />
+    </f:entry>
+
+    <f:dropdownList name="delegate.launcher" title="Launch method"
+                  help="The method to launch the node once the 'Start command' is executed">
+
+        <j:forEach var="d" items="${h.getComputerLauncherDescriptors()}">
+            <!-- TODO: if launcher != onDemand-->
+            <f:dropdownListBlock title="${d.displayName}" value="${d.clazz.name}" staplerClass="${d.clazz}" />
+          <!--f:dropdownListBlock value="${d.clazz.name}" name="${d.displayName}"
+                               selected="${false}"
+                               title="${d.displayName}">
+            <j:set var="descriptor" value="${d}"/>
+            <j:set var="instance"
+                   value="${it.delegateLauncher.descriptor==d ? it.delegateLauncher : null}"/>
+            <f:class-entry descriptor="${d}" />
+            <st:include from="${d}" page="${d.configPage}" optional="true"/>
+          </f:dropdownListBlock-->
+        </j:forEach>
+    </f:dropdownList>
+        <!--j:forEach var="dd" items="${h.getComputerLauncherDescriptors()}">
+        <f:dropdownListBlock value="${dd.clazz.name}"
+                             selected="${it.delegateLauncher.descriptor==dd}"
+                             title="${dd.displayName}"
+                             staplerClass="${delegateDescriptor.clazz.name}">
+          <j:set var="delegateDescriptor" value="${dd}"/>
+          <j:set var="delegateLauncher"
+                 value="${it.delegateLauncher.descriptor==delegateDescriptor ? it.delegateLauncher : null}"/>
+          <f:class-entry descriptor="${dd}" />
+          <st:include from="${dd}" page="${dd.configPage}" optional="true" it="${delegateLauncher}"/>
+        </f:dropdownListBlock>
+        </j:forEach-->
+
+    <f:entry title="Stop command" field="stopCommand">
+        <f:expandableTextbox  />
+    </f:entry>
+
+</j:jelly>

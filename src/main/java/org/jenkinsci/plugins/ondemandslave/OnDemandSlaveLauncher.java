@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.ondemandslave;
 
 
 import com.google.common.base.Strings;
+import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
@@ -9,6 +10,7 @@ import hudson.slaves.ComputerLauncher;
 import hudson.slaves.SlaveComputer;
 import hudson.util.StreamTaskListener;
 import jenkins.model.Jenkins;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,13 +19,14 @@ import java.io.PrintStream;
 /**
  * Implements the custom logic for an on-demand slave, executing commands before connecting and after disconnecting
  */
-class OnDemandSlaveLauncher extends ComputerLauncher {
+public class OnDemandSlaveLauncher extends ComputerLauncher {
 
     private final ComputerLauncher delegate;
     private final String startCommand;
     private final String stopCommand;
 
-    OnDemandSlaveLauncher(ComputerLauncher delegate,
+    @DataBoundConstructor
+    public OnDemandSlaveLauncher(ComputerLauncher delegate,
                           String startCommand,
                           String stopCommand) {
 
@@ -112,8 +115,21 @@ class OnDemandSlaveLauncher extends ComputerLauncher {
         ComputerLauncher.checkJavaVersion(logger, javaCommand, r);
     }
 
-    @Override
-    public Descriptor<ComputerLauncher> getDescriptor() {
-        return delegate.getDescriptor();
+    @Extension
+    public static class DescriptorImpl extends Descriptor<ComputerLauncher> {
+
+        public String getDisplayName() {
+            return "Start and stop this node on-demand";
+        }
+
+        /* Todo: validation including delegating itself
+        public FormValidation doCheckCommand(@QueryParameter String value) {
+            if(Util.fixEmptyAndTrim(value)==null)
+                return FormValidation.error(Messages.CommandLauncher_NoLaunchCommand());
+            else
+                return FormValidation.ok();
+        }
+        */
+
     }
 }

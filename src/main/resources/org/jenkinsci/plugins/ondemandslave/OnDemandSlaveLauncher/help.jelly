@@ -1,0 +1,6 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+   Wrapper for other launch methods: executes a command for booting up the slave machine, \
+    then connects the Jenkins slave, and upon disconnection executes another command \
+    for shutting down the slave machine.
+</j:jelly>
