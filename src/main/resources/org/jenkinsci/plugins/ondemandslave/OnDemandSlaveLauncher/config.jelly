@@ -5,12 +5,17 @@
         <f:expandableTextbox  />
     </f:entry>
 
+    <f:entry title="Stop command" field="stopCommand">
+        <f:expandableTextbox  />
+    </f:entry>
+
     <f:dropdownList name="delegate.launcher" title="Launch method"
                   help="The method to launch the node once the 'Start command' is executed">
 
         <j:forEach var="d" items="${h.getComputerLauncherDescriptors()}">
-            <!-- TODO: if launcher != onDemand-->
-            <f:dropdownListBlock title="${d.displayName}" value="${d.clazz.name}" staplerClass="${d.clazz}" />
+            <j:if test="${!d.clazz.name.equals(descriptor.clazz.name)}">
+                <f:dropdownListBlock title="${d.displayName}" value="${d.clazz.name}" staplerClass="${d.clazz}" />
+            </j:if>
           <!--f:dropdownListBlock value="${d.clazz.name}" name="${d.displayName}"
                                selected="${false}"
                                title="${d.displayName}">
@@ -34,9 +39,5 @@
           <st:include from="${dd}" page="${dd.configPage}" optional="true" it="${delegateLauncher}"/>
         </f:dropdownListBlock>
         </j:forEach-->
-
-    <f:entry title="Stop command" field="stopCommand">
-        <f:expandableTextbox  />
-    </f:entry>
 
 </j:jelly>
