@@ -64,6 +64,17 @@ public class OnDemandSlaveLauncher extends DelegatingComputerLauncher {
     }
 
     /*
+     * Getters for Jelly
+     */
+    public String getStartScript() {
+        return startScript;
+    }
+
+    public String getStopScript() {
+        return stopScript;
+    }
+
+    /*
      *  Delegated methods that plug the additional logic for on-demand slaves
      */
 
