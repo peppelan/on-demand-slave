@@ -2,26 +2,22 @@ package org.jenkinsci.plugins.ondemandslave;
 
 
 import com.google.common.base.Strings;
-import hudson.Extension;
-import hudson.Functions;
-import hudson.Launcher;
+import hudson.*;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.DelegatingComputerLauncher;
 import hudson.slaves.SlaveComputer;
-import hudson.util.StreamTaskListener;
+import hudson.tasks.Shell;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements the custom logic for an on-demand slave, executing commands before connecting and after disconnecting
+ * Implements the custom logic for an on-demand slave, executing scripts before connecting and after disconnecting
  */
 public class OnDemandSlaveLauncher extends DelegatingComputerLauncher {
 
@@ -38,9 +34,9 @@ public class OnDemandSlaveLauncher extends DelegatingComputerLauncher {
     }
 
     /**
-     * Executes a command on the master node, with a bit of tracing.
+     * Executes a script on the master node, with a bit of tracing.
      */
-    private void execute(String command, TaskListener listener) {
+    private void execute(String script, TaskListener listener) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.getInstance();
 
         if (jenkins == null) {
@@ -48,18 +44,22 @@ public class OnDemandSlaveLauncher extends DelegatingComputerLauncher {
             return;
         }
 
-        if (Strings.isNullOrEmpty(command)) {
-            listener.getLogger().println("No command to be executed for this on-demand slave.");
+        if (Strings.isNullOrEmpty(script)) {
+            listener.getLogger().println("No script to be executed for this on-demand slave.");
             return;
         }
 
-        try {
             Launcher launcher = jenkins.getRootPath().createLauncher(listener);
-            launcher.launch().cmdAsSingleString(command).stdout(listener).join();
-        } catch (Exception e) {
-            listener.getLogger().println("Failed executing command '" + command + "'");
-            e.printStackTrace(listener.getLogger());
-        }
+            Shell shell = new Shell(script);
+            FilePath root = jenkins.getRootPath();
+            FilePath scriptFile = shell.createScriptFile(root);
+            int r = launcher.launch().cmds(shell.buildCommandLine(scriptFile)).stdout(listener).join();
+
+            if (r != 0) {
+                throw new AbortException("Script failed with return code " + Integer.toString(r) + ".");
+            }
+
+            listener.getLogger().println("Script executed successfully.");
 
     }
 
@@ -87,7 +87,13 @@ public class OnDemandSlaveLauncher extends DelegatingComputerLauncher {
     @Override
     public void afterDisconnect(SlaveComputer computer, TaskListener listener) {
         super.afterDisconnect(computer, listener);
-        execute(stopScript, listener);
+
+        try {
+            execute(stopScript, listener);
+        }  catch (Exception e) {
+            listener.getLogger().println("Failed executing script '" + stopScript + "'.");
+            e.printStackTrace(listener.getLogger());
+        }
     }
 
     @Extension
