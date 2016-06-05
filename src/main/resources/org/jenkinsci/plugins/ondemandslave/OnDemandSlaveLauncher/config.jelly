@@ -9,6 +9,6 @@
         <f:expandableTextbox  />
     </f:entry>
 
-    <f:dropdownDescriptorSelector title="${%Actual launch method}" field="launcher" descriptors="${descriptor.getApplicableDescriptors()}" />
+    <st:include page="config.jelly" class="hudson.slaves.DelegatingComputerLauncher"/>
 
 </j:jelly>
