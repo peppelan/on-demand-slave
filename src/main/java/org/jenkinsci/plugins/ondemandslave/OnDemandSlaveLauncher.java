@@ -13,8 +13,6 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implements the custom logic for an on-demand slave, executing scripts before connecting and after disconnecting
@@ -98,22 +96,8 @@ public class OnDemandSlaveLauncher extends DelegatingComputerLauncher {
 
     @Extension
     public static class DescriptorImpl extends Descriptor<ComputerLauncher> {
-
         public String getDisplayName() {
             return "Start and stop this node on-demand";
-        }
-
-        /**
-         * Returns the applicable nested computer launcher types.
-         * The default implementation avoids all delegating descriptors, as that creates infinite recursion.
-         */
-        public List<Descriptor<ComputerLauncher>> getApplicableDescriptors() {
-            List<Descriptor<ComputerLauncher>> r = new ArrayList<>();
-            for (Descriptor<ComputerLauncher> d : Functions.getComputerLauncherDescriptors()) {
-                if (DelegatingComputerLauncher.class.isAssignableFrom(d.getKlass().toJavaClass()))  continue;
-                r.add(d);
-            }
-            return r;
         }
     }
 
